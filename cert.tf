@@ -1,6 +1,6 @@
 # The entire section create a certiface, public zone, and validate the certificate using DNS method
 
-# Create the certificate using a wildcard for all the domains created in depps
+# Create the certificate using a wildcard for all the domains created in depps.site
 resource "aws_acm_certificate" "depps" {
   domain_name       = "*.depps.site"
   validation_method = "DNS"
@@ -36,7 +36,7 @@ resource "aws_acm_certificate_validation" "depps" {
   validation_record_fqdns = [for record in aws_route53_record.depps : record.fqdn]
 }
 
-# create records for tooling
+# # create records for tooling
 resource "aws_route53_record" "tooling" {
   zone_id = data.aws_route53_zone.depps.zone_id
   name    = "tooling.depps.site"
@@ -49,7 +49,8 @@ resource "aws_route53_record" "tooling" {
   }
 }
 
-# create records for wordpress
+
+# # create records for wordpress
 resource "aws_route53_record" "wordpress" {
   zone_id = data.aws_route53_zone.depps.zone_id
   name    = "wordpress.depps.site"

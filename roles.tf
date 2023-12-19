@@ -13,16 +13,14 @@ resource "aws_iam_role" "ec2_instance_role" {
       },
     ]
   })
-
   tags = merge(
     var.tags,
     {
       Name = "aws assume role"
+      Environment = var.environment
     },
   )
 }
-
-
 
 resource "aws_iam_policy" "policy" {
   name        = "ec2_instance_policy"
@@ -44,13 +42,11 @@ resource "aws_iam_policy" "policy" {
   tags = merge(
     var.tags,
     {
-      Name = "aws assume policy"
+      Name =  "aws assume policy"
+      Environment = var.environment
     },
   )
-
 }
-
-
 
 resource "aws_iam_role_policy_attachment" "test-attach" {
   role       = aws_iam_role.ec2_instance_role.name
@@ -61,5 +57,3 @@ resource "aws_iam_instance_profile" "ip" {
   name = "aws_instance_profile_test"
   role = aws_iam_role.ec2_instance_role.name
 }
-
-    

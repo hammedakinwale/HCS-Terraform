@@ -17,20 +17,21 @@ preferred_number_of_private_subnets = 4
 environment = "Production"
 
 
-ami = "ami-08c40ec9ead489470"
+ami = "ami-06aa3f7caf3a30282"
 
-keypair = "devops"
+keypair = "Vir"
 
 # Ensure to change this to your acccount number
-account_no = "576440278504"
+account_no = "183540202232"
 
-master-username = "tony"
+# master-username = "ojo"
 
-master-password = "devopspbl"
+db-password = "devops-account"
 
+db-username     = "ojo"
 
 tags = {
-  Owner-Email     = "akojianthony2@gmail.com"
+  Owner-Email     = "hammedakinwale35@gmail.com"
   Managed-By      = "terraform"
   Billing-Account = "1234567890"
 } 

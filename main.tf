@@ -1,27 +1,29 @@
 provider "aws" {
   region = var.region
+  access_key = "AKIASVO6ZHL4ILV2UNF3"
+  secret_key = "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"
 }
 
 # Create VPC
 resource "aws_vpc" "main" {
-  cidr_block                     = var.vpc_cidr
-  enable_dns_support             = var.enable_dns_support
-  enable_dns_hostnames           = var.enable_dns_hostnames
-  enable_classiclink             = var.enable_classiclink
-  enable_classiclink_dns_support = var.enable_classiclink_dns_support
-
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = var.enable_dns_support
+  enable_dns_hostnames = var.enable_dns_hostnames
+  # enable_classiclink             = var.enable_classiclink
+  # enable_classiclink_dns_support = var.enable_classiclink_dns_support
   tags = merge(
-    var.tags,
-    {
-      Name = format("%s-VPC", var.name)
-    }
-  )
+  var.tags,
+  {
+    Name = format("%s-VPC-%s", var.name, var.environment)
+  },
+)
 }
 
 # Get list of availability zones
 data "aws_availability_zones" "available" {
   state = "available"
 }
+
 
 # Create public subnets
 resource "aws_subnet" "public" {
@@ -33,9 +35,10 @@ resource "aws_subnet" "public" {
   tags = merge(
     var.tags,
     {
-      Name = format("%s-PublicSubnet-%s", var.name, count.index)
+      Name = format("%s-Public-Subnet-%s", var.name, count.index)
     },
   )
+
 }
 
 # Create private subnets
@@ -48,12 +51,7 @@ resource "aws_subnet" "private" {
   tags = merge(
     var.tags,
     {
-      Name = format("%s-PrivateSubnet-%s", var.name, count.index)
+      Name = format("%s-Private-Subnet-%s", var.name, count.index)
     },
   )
-
 }
-
-
-
-

@@ -1,5 +1,5 @@
 # create key from key management system
-resource "aws_kms_key" "TCS-kms" {
+resource "aws_kms_key" "HCS-kms" {
   description = "KMS key "
   policy      = <<EOF
   {
@@ -21,40 +21,42 @@ EOF
 # create key alias
 resource "aws_kms_alias" "alias" {
   name          = "alias/kms"
-  target_key_id = aws_kms_key.TCS-kms.key_id
+  target_key_id = aws_kms_key.HCS-kms.key_id
 }
 
-
 # create Elastic file system
-resource "aws_efs_file_system" "TCS-efs" {
+resource "aws_efs_file_system" "HCS-efs" {
   encrypted  = true
-  kms_key_id = aws_kms_key.TCS-kms.arn
+  kms_key_id = aws_kms_key.HCS-kms.arn
 
-  tags = merge(
+ tags = merge(
     var.tags,
     {
-      Name = "TCS-efs"
+      Name = "HCS-efs"
     },
   )
 }
 
+
 # set first mount target for the EFS 
 resource "aws_efs_mount_target" "subnet-1" {
-  file_system_id  = aws_efs_file_system.TCS-efs.id
-  subnet_id       = aws_subnet.private[2].id
+  file_system_id  = aws_efs_file_system.HCS-efs.id
+  subnet_id       = aws_subnet.private[0].id
   security_groups = [aws_security_group.datalayer-sg.id]
 }
 
-# set second mount target for the EFS 
+
+# set second mount target for the EFS
 resource "aws_efs_mount_target" "subnet-2" {
-  file_system_id  = aws_efs_file_system.TCS-efs.id
-  subnet_id       = aws_subnet.private[3].id
+  file_system_id  = aws_efs_file_system.HCS-efs.id
+  subnet_id       = aws_subnet.private[1].id
   security_groups = [aws_security_group.datalayer-sg.id]
 }
+
 
 # create access point for wordpress
 resource "aws_efs_access_point" "wordpress" {
-  file_system_id = aws_efs_file_system.TCS-efs.id
+  file_system_id = aws_efs_file_system.HCS-efs.id
 
   posix_user {
     gid = 0
@@ -74,9 +76,10 @@ resource "aws_efs_access_point" "wordpress" {
 
 }
 
+
 # create access point for tooling
 resource "aws_efs_access_point" "tooling" {
-  file_system_id = aws_efs_file_system.TCS-efs.id
+  file_system_id = aws_efs_file_system.HCS-efs.id
   posix_user {
     gid = 0
     uid = 0
@@ -91,6 +94,6 @@ resource "aws_efs_access_point" "tooling" {
       owner_uid   = 0
       permissions = 0755
     }
+
   }
 }
-  

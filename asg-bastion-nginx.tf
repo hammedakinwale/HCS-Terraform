@@ -1,11 +1,11 @@
 #### creating sns topic for all the auto scaling groups
-resource "aws_sns_topic" "tony-sns" {
+resource "aws_sns_topic" "hammed-sns" {
   name = "Default_CloudWatch_Alarms_Topic"
 }
 
 # creating notification for all the auto scaling groups
 
-resource "aws_autoscaling_notification" "tony_notifications" {
+resource "aws_autoscaling_notification" "hammed_notifications" {
   group_names = [
     aws_autoscaling_group.bastion-asg.name,
     aws_autoscaling_group.nginx-asg.name,
@@ -19,7 +19,7 @@ resource "aws_autoscaling_notification" "tony_notifications" {
     "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
   ]
 
-  topic_arn = aws_sns_topic.tony-sns.arn
+  topic_arn = aws_sns_topic.hammed-sns.arn
 }
 
 resource "random_shuffle" "az_list" {
@@ -80,7 +80,7 @@ resource "aws_autoscaling_group" "bastion-asg" {
   }
   tag {
     key                 = "Name"
-    value               = "TCS-bastion"
+    value               = "HCS-bastion"
     propagate_at_launch = true
   }
 
@@ -126,10 +126,10 @@ resource "aws_launch_template" "nginx-launch-template" {
 resource "aws_autoscaling_group" "nginx-asg" {
   name                      = "nginx-asg"
   max_size                  = 2
-  min_size                  = 1
+  min_size                  = 2
   health_check_grace_period = 300
   health_check_type         = "ELB"
-  desired_capacity          = 1
+  desired_capacity          = 2
 
   vpc_zone_identifier = [
     aws_subnet.public[0].id,
@@ -143,7 +143,7 @@ resource "aws_autoscaling_group" "nginx-asg" {
 
   tag {
     key                 = "Name"
-    value               = "TCS-nginx"
+    value               = "HCS-nginx"
     propagate_at_launch = true
   }
 
@@ -152,5 +152,5 @@ resource "aws_autoscaling_group" "nginx-asg" {
 # attaching autoscaling group of nginx to external load balancer
 resource "aws_autoscaling_attachment" "asg_attachment_nginx" {
   autoscaling_group_name = aws_autoscaling_group.nginx-asg.id
-  alb_target_group_arn   = aws_lb_target_group.nginx-tgt.arn
+  lb_target_group_arn   = aws_lb_target_group.nginx-tgt.arn
 }

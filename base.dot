@@ -1,0 +1,64 @@
+digraph {
+	compound = "true"
+	newrank = "true"
+	subgraph "root" {
+		"[root] aws_eip.nat_eip (expand)" [label = "aws_eip.nat_eip", shape = "box"]
+		"[root] aws_internet_gateway.ig (expand)" [label = "aws_internet_gateway.ig", shape = "box"]
+		"[root] aws_nat_gateway.nat (expand)" [label = "aws_nat_gateway.nat", shape = "box"]
+		"[root] aws_subnet.private (expand)" [label = "aws_subnet.private", shape = "box"]
+		"[root] aws_subnet.public (expand)" [label = "aws_subnet.public", shape = "box"]
+		"[root] aws_vpc.main (expand)" [label = "aws_vpc.main", shape = "box"]
+		"[root] data.aws_availability_zones.available (expand)" [label = "data.aws_availability_zones.available", shape = "box"]
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" [label = "provider[\"registry.terraform.io/hashicorp/aws\"]", shape = "diamond"]
+		"[root] var.account_no" [label = "var.account_no", shape = "note"]
+		"[root] var.ami" [label = "var.ami", shape = "note"]
+		"[root] var.enable_classiclink" [label = "var.enable_classiclink", shape = "note"]
+		"[root] var.enable_classiclink_dns_support" [label = "var.enable_classiclink_dns_support", shape = "note"]
+		"[root] var.enable_dns_hostnames" [label = "var.enable_dns_hostnames", shape = "note"]
+		"[root] var.enable_dns_support" [label = "var.enable_dns_support", shape = "note"]
+		"[root] var.environment" [label = "var.environment", shape = "note"]
+		"[root] var.keypair" [label = "var.keypair", shape = "note"]
+		"[root] var.master-password" [label = "var.master-password", shape = "note"]
+		"[root] var.master-username" [label = "var.master-username", shape = "note"]
+		"[root] var.name" [label = "var.name", shape = "note"]
+		"[root] var.preferred_number_of_private_subnets" [label = "var.preferred_number_of_private_subnets", shape = "note"]
+		"[root] var.preferred_number_of_public_subnets" [label = "var.preferred_number_of_public_subnets", shape = "note"]
+		"[root] var.region" [label = "var.region", shape = "note"]
+		"[root] var.tags" [label = "var.tags", shape = "note"]
+		"[root] var.vpc_cidr" [label = "var.vpc_cidr", shape = "note"]
+		"[root] aws_eip.nat_eip (expand)" -> "[root] aws_internet_gateway.ig (expand)"
+		"[root] aws_internet_gateway.ig (expand)" -> "[root] aws_vpc.main (expand)"
+		"[root] aws_internet_gateway.ig (expand)" -> "[root] var.name"
+		"[root] aws_internet_gateway.ig (expand)" -> "[root] var.tags"
+		"[root] aws_nat_gateway.nat (expand)" -> "[root] aws_eip.nat_eip (expand)"
+		"[root] aws_nat_gateway.nat (expand)" -> "[root] aws_subnet.public (expand)"
+		"[root] aws_subnet.private (expand)" -> "[root] aws_vpc.main (expand)"
+		"[root] aws_subnet.private (expand)" -> "[root] data.aws_availability_zones.available (expand)"
+		"[root] aws_subnet.private (expand)" -> "[root] var.name"
+		"[root] aws_subnet.private (expand)" -> "[root] var.preferred_number_of_private_subnets"
+		"[root] aws_subnet.private (expand)" -> "[root] var.tags"
+		"[root] aws_subnet.public (expand)" -> "[root] aws_vpc.main (expand)"
+		"[root] aws_subnet.public (expand)" -> "[root] data.aws_availability_zones.available (expand)"
+		"[root] aws_subnet.public (expand)" -> "[root] var.name"
+		"[root] aws_subnet.public (expand)" -> "[root] var.preferred_number_of_public_subnets"
+		"[root] aws_subnet.public (expand)" -> "[root] var.tags"
+		"[root] aws_vpc.main (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] aws_vpc.main (expand)" -> "[root] var.enable_dns_hostnames"
+		"[root] aws_vpc.main (expand)" -> "[root] var.enable_dns_support"
+		"[root] aws_vpc.main (expand)" -> "[root] var.vpc_cidr"
+		"[root] data.aws_availability_zones.available (expand)" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"]"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_nat_gateway.nat (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)" -> "[root] aws_subnet.private (expand)"
+		"[root] provider[\"registry.terraform.io/hashicorp/aws\"]" -> "[root] var.region"
+		"[root] root" -> "[root] provider[\"registry.terraform.io/hashicorp/aws\"] (close)"
+		"[root] root" -> "[root] var.account_no"
+		"[root] root" -> "[root] var.ami"
+		"[root] root" -> "[root] var.enable_classiclink"
+		"[root] root" -> "[root] var.enable_classiclink_dns_support"
+		"[root] root" -> "[root] var.environment"
+		"[root] root" -> "[root] var.keypair"
+		"[root] root" -> "[root] var.master-password"
+		"[root] root" -> "[root] var.master-username"
+	}
+}
+

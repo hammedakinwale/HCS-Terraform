@@ -1,5 +1,5 @@
 variable "region" {
-  default = "us-west-2"
+  default = "us-east-1"
 }
 
 variable "vpc_cidr" {
@@ -34,7 +34,7 @@ variable "preferred_number_of_private_subnets" {
 
 variable "name" {
   type    = string
-  default = "TCS"
+  default = "HCS"
 
 }
 
@@ -54,7 +54,7 @@ variable "environment" {
 
 variable "ami" {
   type        = string
-  description = "AMI ID for launch template"
+  description = "AMI ID for launch templates"
 
 }
 
@@ -69,13 +69,12 @@ variable "account_no" {
   description = "the account number"
 }
 
-
-variable "master-username" {
+variable "db-username" {
   type        = string
   description = "RDS admin username"
 }
 
-variable "master-password" {
+variable "db-password" {
   type        = string
   description = "RDS master password"
 }

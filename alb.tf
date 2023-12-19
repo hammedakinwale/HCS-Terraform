@@ -1,4 +1,6 @@
-# create an ALB to balance the traffic between the Instances
+# ----------------------------
+#External Load balancer for reverse proxy nginx
+#---------------------------------
 
 resource "aws_lb" "ext-alb" {
   name     = "ext-alb"
@@ -12,16 +14,48 @@ resource "aws_lb" "ext-alb" {
     aws_subnet.public[1].id
   ]
 
-  tags = merge(
+   tags = merge(
     var.tags,
     {
-      Name = "TCS-ext-alb"
+      Name = "HCS-ext-alb"
     },
   )
 
   ip_address_type    = "ipv4"
   load_balancer_type = "application"
 }
+
+#--- create a target group for the external load balancer
+resource "aws_lb_target_group" "nginx-tgt" {
+  health_check {
+    interval            = 10
+    path                = "/healthstatus"
+    protocol            = "HTTPS"
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+  }
+  name        = "nginx-tgt"
+  port        = 443
+  protocol    = "HTTPS"
+  target_type = "instance"
+  vpc_id      = aws_vpc.main.id
+}
+
+#--- create a listener for the load balancer
+
+resource "aws_lb_listener" "nginx-listner" {
+  load_balancer_arn = aws_lb.ext-alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate_validation.depps.certificate_arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.nginx-tgt.arn
+  }
+}
+
 
 
 # ----------------------------
@@ -40,10 +74,10 @@ resource "aws_lb" "ialb" {
     aws_subnet.private[1].id
   ]
 
-  tags = merge(
+ tags = merge(
     var.tags,
     {
-      Name = "TCS-int-alb"
+      Name = "HCS-int-alb"
     },
   )
 
@@ -51,27 +85,6 @@ resource "aws_lb" "ialb" {
   load_balancer_type = "application"
 }
 
-
-
-
-
-# Create Target group to point its targets
-
-resource "aws_lb_target_group" "nginx-tgt" {
-  health_check {
-    interval            = 10
-    path                = "/healthstatus"
-    protocol            = "HTTPS"
-    timeout             = 5
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-  }
-  name        = "nginx-tgt"
-  port        = 443
-  protocol    = "HTTPS"
-  target_type = "instance"
-  vpc_id      = aws_vpc.main.id
-}
 
 # --- target group  for wordpress -------
 
@@ -92,6 +105,7 @@ resource "aws_lb_target_group" "wordpress-tgt" {
   vpc_id      = aws_vpc.main.id
 }
 
+
 # --- target group for tooling -------
 
 resource "aws_lb_target_group" "tooling-tgt" {
@@ -104,39 +118,23 @@ resource "aws_lb_target_group" "tooling-tgt" {
     unhealthy_threshold = 2
   }
 
-  name        = "tooling-tgt"
+  name        = "hammed-tooling-tgt"
   port        = 443
   protocol    = "HTTPS"
   target_type = "instance"
   vpc_id      = aws_vpc.main.id
 }
 
-
-
-
-# create a Listner for the target Group
-
-resource "aws_lb_listener" "nginx-listner" {
-  load_balancer_arn = aws_lb.ext-alb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate_validation.depps.certificate_arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.nginx-tgt.arn
-  }
-}
-
-
 # For this aspect a single listener was created for the wordpress which is default,
 # A rule was created to route traffic to tooling when the host header changes
+
 
 resource "aws_lb_listener" "web-listener" {
   load_balancer_arn = aws_lb.ialb.arn
   port              = 443
   protocol          = "HTTPS"
   certificate_arn   = aws_acm_certificate_validation.depps.certificate_arn
+
 
   default_action {
     type             = "forward"
@@ -160,4 +158,4 @@ resource "aws_lb_listener_rule" "tooling-listener" {
       values = ["tooling.depps.site"]
     }
   }
-}
+} 

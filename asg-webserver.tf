@@ -11,8 +11,9 @@ resource "aws_launch_template" "wordpress-launch-template" {
 
   key_name = var.keypair
 
+
   placement {
-    availability_zone = "$(random_shuffle.az_list.result)"
+    availability_zone = "random_shuffle.az_list.result"
   }
 
   lifecycle {
@@ -23,11 +24,11 @@ resource "aws_launch_template" "wordpress-launch-template" {
     resource_type = "instance"
 
     tags = merge(
-      var.tags,
-      {
-        Name = "wordpress-launch-template"
-      },
-    )
+    var.tags,
+    {
+      Name = "wordpress-launch-template"
+    },
+  )
 
   }
 
@@ -49,22 +50,26 @@ resource "aws_autoscaling_group" "wordpress-asg" {
     aws_subnet.private[1].id
   ]
 
+
   launch_template {
     id      = aws_launch_template.wordpress-launch-template.id
     version = "$Latest"
   }
   tag {
     key                 = "Name"
-    value               = "TCS-wordpress"
+    value               = "HCS-wordpress"
     propagate_at_launch = true
   }
 }
 
+
 # attaching autoscaling group of  wordpress application to internal loadbalancer
 resource "aws_autoscaling_attachment" "asg_attachment_wordpress" {
   autoscaling_group_name = aws_autoscaling_group.wordpress-asg.id
-  alb_target_group_arn   = aws_lb_target_group.wordpress-tgt.arn
+  lb_target_group_arn   = aws_lb_target_group.wordpress-tgt.arn
 }
+
+
 
 # launch template for toooling
 resource "aws_launch_template" "tooling-launch-template" {
@@ -78,8 +83,9 @@ resource "aws_launch_template" "tooling-launch-template" {
 
   key_name = var.keypair
 
+
   placement {
-    availability_zone = "$(random_shuffle.az_list.result)"
+    availability_zone = "random_shuffle.az_list.result"
   }
 
   lifecycle {
@@ -90,16 +96,18 @@ resource "aws_launch_template" "tooling-launch-template" {
     resource_type = "instance"
 
     tags = merge(
-      var.tags,
-      {
-        Name = "tooling-launch-template"
-      },
-    )
-
+    var.tags,
+    {
+      Name = "tooling-launch-template"
+    },
+  )
   }
 
   user_data = filebase64("${path.module}/tooling.sh")
 }
+
+
+
 
 # ---- Autoscaling for tooling -----
 
@@ -124,14 +132,13 @@ resource "aws_autoscaling_group" "tooling-asg" {
 
   tag {
     key                 = "Name"
-    value               = "TCS-tooling"
+    value               = "HCS-tooling"
     propagate_at_launch = true
   }
 }
 
-
 # attaching autoscaling group of  tooling application to internal loadbalancer
 resource "aws_autoscaling_attachment" "asg_attachment_tooling" {
   autoscaling_group_name = aws_autoscaling_group.tooling-asg.id
-  alb_target_group_arn   = aws_lb_target_group.tooling-tgt.arn
+  lb_target_group_arn   = aws_lb_target_group.tooling-tgt.arn
 }
